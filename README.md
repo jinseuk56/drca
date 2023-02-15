@@ -1,8 +1,32 @@
-# Dimensionality reduction and unsupervised clustering for EELS-SI
+# DR_assisted_cluster_analysis
 
-This jupyter notebook demonstrates an example of the research work described in <u><strong>J. Ryu et al. (2021), Ultramicroscopy.</strong></u> (https://doi.org/10.1016/j.ultramic.2021.113314)<br>
-To obtain the detailed information, please read the article.
+Dimensionality-reduction-assisted cluster analysis for STEM-derived multi-dimensional data (EELS-SI, 4D-STEM)
 
-Jinseok Ryu (jinseuk56@gmail.com)<br>
-Electron Microscopy and Spectroscopy Lab.<br>
-Dept. of Materials Science and Engineering, Seoul National University<br>
+___
+
+### How to install
+<code>pip install hyperspy==1.6.4  
+conda install -c conda-forge scikit-learn  
+conda install -c conda-forge matplotlib  
+conda install -c conda-forge jupyterlab  
+pip install drca  
+pip install ipympl  
+</code>
+
+___
+
+### Citation
+@article{ryu2021drca,<br>
+author = {Ryu, J. and Kim, H. and Kim, R. M. and Kim, S. and Jo, J. and Lee, S. and Nam, K. T. and Joo, Y. C. and Yi, G. C. and Lee, J. and Kim, M.},<br>
+title = {Dimensionality reduction and unsupervised clustering for EELS-SI},<br>
+journal = {Ultramicroscopy},<br>
+volume = {231},<br>
+pages = {113314},<br>
+year = {2021},<br>
+}
+
+___
+Jinseok Ryu ([jinseuk56@gmail.com](mailto:jinseuk56@gmail.com)), Ph.D.  
+Electron Microscopy and Spectroscopy Lab.  
+Dept. of Materials Science and Engineering  
+Seoul National University  
