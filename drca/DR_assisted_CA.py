@@ -42,7 +42,7 @@ sm.set_array([])
 cm_rep = ["gray", "Reds", "Greens", "Blues", "Oranges", "Purples"]  
     
 class DR_assisted_CA():
-    def __init__(self, adr, dat_dim, dat_unit, cr_range=None, rescale=True, DM_file=True):
+    def __init__(self, adr, dat_dim, dat_unit, cr_range=None, dat_scale=1, rescale=True, DM_file=True):
         self.file_adr = adr
         self.num_img = len(adr)
         self.dat_dim = dat_dim
@@ -52,7 +52,7 @@ class DR_assisted_CA():
         self.cr_range = cr_range
         
         if cr_range:
-            self.dat_dim_range = np.arange(cr_range[0], cr_range[1], cr_range[2])
+            self.dat_dim_range = np.arange(cr_range[0], cr_range[1], cr_range[2]) * dat_scale
             self.num_dim = len(self.dat_dim_range)
         
         if dat_dim == 3:
@@ -63,13 +63,13 @@ class DR_assisted_CA():
             
         self.original_data_shape = self.data_shape.copy()
              
-    def binning(self, bin_y, bin_x, str_y, str_x, offset=0, rescale=True):
+    def binning(self, bin_y, bin_x, str_y, str_x, offset=0, rescale_0to1=True):
         dataset = []
         data_shape_new = []
         
         for img in self.data_storage:
             print(img.shape)
-            processed = binning_SI(img, bin_y, bin_x, str_y, str_x, offset, self.num_dim, rescale) # include the step for re-scaling the actual input
+            processed = binning_SI(img, bin_y, bin_x, str_y, str_x, offset, self.num_dim, rescale_0to1) # include the step for re-scaling the actual input
             print(processed.shape)
             data_shape_new.append(processed.shape)
             dataset.append(processed)
@@ -131,7 +131,7 @@ class DR_assisted_CA():
                     ax.axis("off")
                     plt.show()
                     
-    def make_input(self, min_val=0.0, max_normalize=True, log_scale=False, radial_flat=True, w_size=0, radial_range=None):
+    def make_input(self, min_val=0.0, max_normalize=True, rescale_0to1=False, log_scale=False, radial_flat=True, w_size=0, radial_range=None):
 
         dataset_flat = []
         if self.dat_dim == 3:
@@ -198,6 +198,10 @@ class DR_assisted_CA():
             dataset_flat = dataset_flat / np.max(dataset_flat, axis=1)[:, np.newaxis]
             print(np.min(dataset_flat), np.max(dataset_flat))
             
+        if rescale_0to1:
+            for i in range(len(dataset_flat)):
+                dataset_flat[i] = zero_one_rescale(dataset_flat[i])
+            
         dataset_flat = dataset_flat.clip(min=min_val)
         print(np.min(dataset_flat), np.max(dataset_flat))
         total_num = len(dataset_flat)
@@ -207,7 +211,7 @@ class DR_assisted_CA():
         self.dataset_input = dataset_flat[self.ri]
         self.dataset_input = self.dataset_input.astype(np.float32)
         
-    def ini_DR(self, method="nmf", num_comp=5, result_visual=True, model_params=None, optim_params=None):
+    def ini_DR(self, method="nmf", num_comp=5, result_visual=True):
         self.DR_num_comp = num_comp
         if method=="nmf":
             self.DR = NMF(n_components=num_comp, init="nndsvda", solver="mu", max_iter=2000, verbose=True)
@@ -223,7 +227,7 @@ class DR_assisted_CA():
             self.DR_comp_vectors = self.DR.components_
         
         elif method=="cae":
-            print("in prepration...")
+            print("in preparation...")
             return
             
         else:
