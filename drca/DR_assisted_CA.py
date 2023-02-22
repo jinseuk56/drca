@@ -465,9 +465,9 @@ class DR_assisted_CA():
 
         self.ax3.cla()
         
-        label_reshape, _, _ = label_arrangement(self.labels, self.data_shape)
+        self.label_reshape, _, _ = label_arrangement(self.labels, self.data_shape)
 
-        self.ax3.imshow(label_reshape[img_sel-1], cmap=custom_cmap, norm=norm)
+        self.ax3.imshow(self.label_reshape[img_sel-1], cmap=custom_cmap, norm=norm)
         self.ax3.set_title("image %d"%(img_sel), fontsize=10)
         self.ax3.axis("off")
 
@@ -488,7 +488,7 @@ class DR_assisted_CA():
         self.clustering_widgets.widget.close_all()
         label_selected = self.clustering_widgets.widget.result
         label_sort = np.unique(label_selected)
-        label_reshape, selected, hist = label_arrangement(label_selected, self.data_shape)
+        self.label_reshape, selected, hist = label_arrangement(label_selected, self.data_shape)
         num_label = len(label_sort)
         print(label_sort) # label "-1" -> not a cluster
         print(hist) # number of data points in each cluster
@@ -509,12 +509,12 @@ class DR_assisted_CA():
         fig, ax = plt.subplots(row_n, col_n, figsize=(7, 10))
         if self.num_img != 1:
             for i, axs in enumerate(ax.flat):
-                axs.imshow(label_reshape[i], cmap=custom_cmap, norm=norm)
+                axs.imshow(self.label_reshape[i], cmap=custom_cmap, norm=norm)
                 axs.set_title("image %d"%(i+1), fontsize=10)
                 axs.axis("off")
 
         else:
-            ax.imshow(label_reshape[0], cmap=custom_cmap, norm=norm)
+            ax.imshow(self.label_reshape[0], cmap=custom_cmap, norm=norm)
             ax.set_title("image %d"%(1), fontsize=10)
             ax.axis("off")
 
@@ -543,31 +543,31 @@ class DR_assisted_CA():
         # average all of the spectra in each cluster
         
         if self.dat_dim == 3:
-            lines = np.zeros((num_label, self.num_dim))
+            self.lines = np.zeros((num_label, self.num_dim))
 
             for i in range(num_label):
                 ind = np.where(label_selected == label_sort[i])
                 print("number of pixels in the label %d cluster: %d"%(label_sort[i], hist[i]))
-                lines[i] = np.mean(self.dataset_flat[ind], axis=0)
+                self.lines[i] = np.mean(self.dataset_flat[ind], axis=0)
 
             fig, ax = plt.subplots(1, 2, figsize=(15, 8))
 
             # normalize representative spectra for comparison
             if normalize == 'max':
-                denominator = np.max(lines, axis=1)
+                denominator = np.max(self.lines, axis=1)
             elif normalize == 'min':
-                denominator = np.min(lines, axis=1)
-            lines = lines / denominator[:, np.newaxis]
+                denominator = np.min(self.lines, axis=1)
+            self.lines = self.lines / denominator[:, np.newaxis]
 
             if -1 in label_sort:
                 for i in range(1, num_label):
-                    ax[0].plot(self.dat_dim_range, (lines[i]), label="cluster %d"%(i), c=color_rep[i])
-                    ax[1].plot(self.dat_dim_range, (lines[i]+(i-1)*0.25), label="cluster %d"%(i), c=color_rep[i])
+                    ax[0].plot(self.dat_dim_range, (self.lines[i]), label="cluster %d"%(i), c=color_rep[i])
+                    ax[1].plot(self.dat_dim_range, (self.lines[i]+(i-1)*0.25), label="cluster %d"%(i), c=color_rep[i])
 
             else:
                 for i in range(0, num_label):
-                    ax[0].plot(self.dat_dim_range, (lines[i]), label="cluster %d"%(i+1), c=color_rep[i+1])
-                    ax[1].plot(self.dat_dim_range, (lines[i]+i*0.25), label="cluster %d"%(i+1), c=color_rep[i+1])
+                    ax[0].plot(self.dat_dim_range, (self.lines[i]), label="cluster %d"%(i+1), c=color_rep[i+1])
+                    ax[1].plot(self.dat_dim_range, (self.lines[i]+i*0.25), label="cluster %d"%(i+1), c=color_rep[i+1])
 
             ax[0].legend(fontsize="x-large")
             ax[0].set_xlabel(self.dat_unit)
@@ -580,12 +580,12 @@ class DR_assisted_CA():
             plt.show()
             
         elif self.dat_dim == 4:
-            lines = np.zeros((num_label, self.s_length))
+            self.lines = np.zeros((num_label, self.s_length))
 
             for i in range(num_label):
                 ind = np.where(label_selected == label_sort[i])
                 print("number of pixels in the label %d cluster: %d"%(label_sort[i], hist[i]))
-                lines[i] = np.mean(self.dataset_flat[ind], axis=0)
+                self.lines[i] = np.mean(self.dataset_flat[ind], axis=0)
 
             row_n = num_label
             col_n = 1
@@ -595,7 +595,7 @@ class DR_assisted_CA():
             if self.radial_flat:
                 for i, la in enumerate(label_sort):
                     tmp = np.zeros((self.radial_range[1]*2, self.radial_range[1]*2))
-                    tmp[self.k_indy, self.k_indx] = lines[i]
+                    tmp[self.k_indy, self.k_indx] = self.lines[i]
 
                     ax[i].imshow(tmp, cmap="viridis")
                     ax[i].axis("off")
@@ -608,9 +608,9 @@ class DR_assisted_CA():
             else:
                 for i, la in enumerate(label_sort):
                     if log_scale:
-                        ax[i].imshow(np.log(lines[i].reshape((self.w_size*2, self.w_size*2))), cmap="viridis") # log scale - optional
+                        ax[i].imshow(np.log(self.lines[i].reshape((self.w_size*2, self.w_size*2))), cmap="viridis") # log scale - optional
                     else:
-                        ax[i].imshow(lines[i].reshape((self.w_size*2, self.w_size*2)), cmap="viridis")
+                        ax[i].imshow(self.lines[i].reshape((self.w_size*2, self.w_size*2)), cmap="viridis")
                     ax[i].axis("off")
                     if la == -1:
                         ax[i].set_title("not cluster")
@@ -652,7 +652,6 @@ def data_load_3d(adr, crop=None, rescale=True, DM_file=True):
             if crop:
                 temp = tifffile.imread(ad)
                 temp = temp[:, :, crop[0]:crop[1]]
-                temp = temp.data
                 if rescale:
                     temp = temp/np.max(temp)
                 temp = temp.clip(min=0.0)
@@ -841,18 +840,18 @@ def label_arrangement(label_arr, new_shape):
     num_label = len(label_sort)
     hist, edge = np.histogram(label_arr, bins=num_label)
     #print(hist)
-    label_reshape = reshape_coeff(label_arr.reshape(-1, 1), new_shape)
+    self.label_reshape = reshape_coeff(label_arr.reshape(-1, 1), new_shape)
     
-    for i in range(len(label_reshape)):
-        label_reshape[i] = np.squeeze(label_reshape[i])
+    for i in range(len(self.label_reshape)):
+        self.label_reshape[i] = np.squeeze(self.label_reshape[i])
         
     selected = []
     for i in range(num_label):
         temp = []
-        for j in range(len(label_reshape)):
-            img_temp = np.zeros_like(label_reshape[j])
-            img_temp[np.where(label_reshape[j] == label_sort[i])] = 1.0
+        for j in range(len(self.label_reshape)):
+            img_temp = np.zeros_like(self.label_reshape[j])
+            img_temp[np.where(self.label_reshape[j] == label_sort[i])] = 1.0
             temp.append(img_temp)
         selected.append(temp)    
         
-    return label_reshape, selected, hist
+    return self.label_reshape, selected, hist
