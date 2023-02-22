@@ -465,9 +465,9 @@ class DR_assisted_CA():
 
         self.ax3.cla()
         
-        self.label_reshape, _, _ = label_arrangement(self.labels, self.data_shape)
+        label_reshape, _, _ = label_arrangement(self.labels, self.data_shape)
 
-        self.ax3.imshow(self.label_reshape[img_sel-1], cmap=custom_cmap, norm=norm)
+        self.ax3.imshow(label_reshape[img_sel-1], cmap=custom_cmap, norm=norm)
         self.ax3.set_title("image %d"%(img_sel), fontsize=10)
         self.ax3.axis("off")
 
@@ -840,18 +840,18 @@ def label_arrangement(label_arr, new_shape):
     num_label = len(label_sort)
     hist, edge = np.histogram(label_arr, bins=num_label)
     #print(hist)
-    self.label_reshape = reshape_coeff(label_arr.reshape(-1, 1), new_shape)
+    label_reshape = reshape_coeff(label_arr.reshape(-1, 1), new_shape)
     
-    for i in range(len(self.label_reshape)):
-        self.label_reshape[i] = np.squeeze(self.label_reshape[i])
+    for i in range(len(label_reshape)):
+        label_reshape[i] = np.squeeze(label_reshape[i])
         
     selected = []
     for i in range(num_label):
         temp = []
-        for j in range(len(self.label_reshape)):
-            img_temp = np.zeros_like(self.label_reshape[j])
-            img_temp[np.where(self.label_reshape[j] == label_sort[i])] = 1.0
+        for j in range(len(label_reshape)):
+            img_temp = np.zeros_like(label_reshape[j])
+            img_temp[np.where(label_reshape[j] == label_sort[i])] = 1.0
             temp.append(img_temp)
         selected.append(temp)    
         
-    return self.label_reshape, selected, hist
+    return label_reshape, selected, hist
