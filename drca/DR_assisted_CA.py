@@ -260,7 +260,7 @@ class DR_assisted_CA():
                         tmp[self.k_indy, self.k_indx] = self.DR_comp_vectors[i]
 
                         fig, ax = plt.subplots(1, 1, figsize=(5, 5))
-                        ax.imshow(tmp, cmap="viridis")
+                        ax.imshow(tmp, cmap="inferno")
                         ax.axis("off")
                         fig.tight_layout()
                         plt.show()
@@ -268,30 +268,22 @@ class DR_assisted_CA():
                 else:
                     for i in range(self.DR_num_comp):
                         fig, ax = plt.subplots(1, 1, figsize=(5, 5))
-                        ax.imshow(self.DR_comp_vectors[i].reshape((self.w_size*2, self.w_size*2)), cmap="viridis")
+                        ax.imshow(self.DR_comp_vectors[i].reshape((self.w_size*2, self.w_size*2)), cmap="inferno")
                         ax.axis("off")
                         fig.tight_layout()
                         plt.show()
             
             min_val = np.min(coeffs)
             max_val = np.max(coeffs)
-            if self.num_img != 1:
-                for i in range(self.DR_num_comp):
-                    fig, ax = plt.subplots(1, self.num_img, figsize=(5*self.num_img, 5))
-                    for j in range(self.num_img):
-                        tmp = ax[j].imshow(self.coeffs_reshape[j][:, :, i], vmin=min_val, vmax=max_val, cmap="viridis")
-                        ax[j].set_title("loading vector %d map"%(i+1), fontsize=10)
-                        ax[j].axis("off")
-                        fig.colorbar(tmp, cax=fig.add_axes([0.92, 0.15, 0.04, 0.7]))
-                    plt.show()
-            else:            
-                for i in range(self.DR_num_comp):
-                    fig, ax = plt.subplots(1, 1, figsize=(5, 5*self.num_img))
-                    tmp = ax.imshow(self.coeffs_reshape[0][:, :, i], vmin=min_val, vmax=max_val, cmap="viridis")
-                    ax.set_title("loading vector %d map"%(i+1), fontsize=10)
-                    ax.axis("off")
+            for i in range(self.num_img):
+                fig, ax = plt.subplots(1, self.DR_num_comp, figsize=(5*self.DR_num_comp, 5))
+                for j in range(self.DR_num_comp):
+                    tmp = ax[j].imshow(self.coeffs_reshape[i][:, :, j], vmin=min_val, vmax=max_val, cmap="inferno")
+                    ax[j].set_title("loading vector %d map"%(j+1), fontsize=10)
+                    ax[j].axis("off")
                     fig.colorbar(tmp, cax=fig.add_axes([0.92, 0.15, 0.04, 0.7]))
-                    plt.show()
+                plt.show()
+
                     
     def aug_DR(self, num_comp, method="tsne", perplex=[50]):
         start = time.time()
@@ -360,31 +352,20 @@ class DR_assisted_CA():
             green_reshape = reshape_coeff(np.expand_dims(green, axis=1), self.data_shape)
             blue_reshape = reshape_coeff(np.expand_dims(blue, axis=1), self.data_shape)
 
-            if self.num_img != 1:
-                fig, ax = plt.subplots(4, self.num_img, figsize=(5*self.num_img, 5*4))
-                for j in range(self.num_img):
-                    ax[0][j].imshow(color_reshape[j])
-                    ax[0][j].axis("off")
-                    ax[1][j].imshow(red_reshape[j], cmap="Reds")
-                    ax[1][j].axis("off")
-                    ax[2][j].imshow(green_reshape[j], cmap="Greens")
-                    ax[2][j].axis("off")
-                    ax[3][j].imshow(blue_reshape[j], cmap="Blues")
-                    ax[3][j].axis("off")
-                plt.show()
-            else:            
-                fig, ax = plt.subplots(4, 1, figsize=(5*self.num_img, 5*4))
-                ax[0].imshow(color_reshape[0])
+            for j in range(self.num_img):
+                fig, ax = plt.subplots(1, 4, figsize=(5*4, 5))
+                ax[0].imshow(color_reshape[j])
                 ax[0].axis("off")
-                ax[1].imshow(red_reshape[0], cmap="Reds")
-                ax[1].axis("off")    
-                ax[2].imshow(green_reshape[0], cmap="Greens")
-                ax[2].axis("off")    
-                ax[3].imshow(blue_reshape[0], cmap="Blues")
-                ax[3].axis("off")    
+                ax[1].imshow(red_reshape[j], cmap="Reds")
+                ax[1].axis("off")
+                ax[2].imshow(green_reshape[j], cmap="Greens")
+                ax[2].axis("off")
+                ax[3].imshow(blue_reshape[j], cmap="Blues")
+                ax[3].axis("off")
+                fig.tight_layout()
                 plt.show()
 
-    def cluster_analysis(self, method="optics"):
+    def cluster_analysis(self, method="optics", ini_params=None):
         
         self.fig = plt.figure(figsize=(10, 8))
         G = gridspec.GridSpec(2, 4)
@@ -400,10 +381,14 @@ class DR_assisted_CA():
 
         self.optics_before = [-1, -1, -1]
         
+        self.first_params = [0.05, 0.001, 0.05]
+        if ini_params:
+            self.first_params = ini_params
+        
         st = {"description_width": "initial"}
-        msample_wg = pyw.FloatText(value=0.05, description="min. # of samples in a neighborhood", style=st)
-        steep_wg = pyw.FloatText(value=0.001, description="min. steepness", style=st)
-        msize_wg = pyw.FloatText(value=0.05, description="min. # of samples in a cluster", style=st)
+        msample_wg = pyw.FloatText(value=self.first_params[0], description="min. # of samples in a neighborhood", style=st)
+        steep_wg = pyw.FloatText(value=self.first_params[1], description="min. steepness", style=st)
+        msize_wg = pyw.FloatText(value=self.first_params[2], description="min. # of samples in a cluster", style=st)
         img_wg = pyw.Select(options=np.arange(self.num_img)+1, value=1, description="image selection", style=st)
 
         self.clustering_widgets = pyw.interact(self.clustering, msample=msample_wg, steep=steep_wg, msize=msize_wg,  img_sel=img_wg)
@@ -498,47 +483,32 @@ class DR_assisted_CA():
             Xo = self.X[label_selected == klass]
             ax.scatter(Xo[:, 0], Xo[:, 1], color=color, alpha=0.3, marker='.')
         ax.plot(self.X[label_selected == -1, 0], self.X[label_selected == -1, 1], 'k+', alpha=0.1)
-        #ax.axis("off")
         fig.tight_layout()
         plt.show()
         
         # clustering result - spatial distribution of each cluster
-        row_n = 1
-        col_n = self.num_img
 
-        fig, ax = plt.subplots(row_n, col_n, figsize=(7, 10))
-        if self.num_img != 1:
-            for i, axs in enumerate(ax.flat):
-                axs.imshow(self.label_reshape[i], cmap=custom_cmap, norm=norm)
-                axs.set_title("image %d"%(i+1), fontsize=10)
-                axs.axis("off")
-
-        else:
-            ax.imshow(self.label_reshape[0], cmap=custom_cmap, norm=norm)
-            ax.set_title("image %d"%(1), fontsize=10)
+        
+        for i in range(self.num_img):
+            fig, ax = plt.subplots(1, 1, figsize=(8, 8))
+            ax.imshow(self.label_reshape[i], cmap=custom_cmap, norm=norm)
+            ax.set_title("image %d"%(i+1), fontsize=10)
             ax.axis("off")
+            fig.tight_layout()
+            plt.show()
 
-        fig.tight_layout()
-        plt.show()
         
         if tf_map:
-            if self.num_img != 1:
-                for i in range(num_label):
-                    fig, ax = plt.subplots(1, self.num_img, figsize=(3*self.num_img, 3))
-                    for j in range(self.num_img):
-                        ax[j].imshow(selected[i][j], cmap="afmhot")
-                        ax[j].set_title("label %d map"%(label_sort[i]+1), fontsize=10)
-                        ax[j].axis("off")
-                        fig.tight_layout()
-                    plt.show()
-            else:            
-                for i in range(num_label):
-                    fig, ax = plt.subplots(1, 1, figsize=(3*self.num_img, 3))
-                    tmp = ax.imshow(selected[i][0], cmap="afmhot")
-                    ax.axis("off")
+            for i in range(self.num_img):
+                fig, ax = plt.subplots(1, num_label, figsize=(3*num_label, 3))
+                for j in range(num_label):
+                    ax[j].imshow(selected[j][i], cmap="afmhot")
+                    ax[j].set_title("label %d map"%(label_sort[j]+1), fontsize=10)
+                    ax[j].axis("off")
                     fig.tight_layout()
-                    plt.show()
-        
+                plt.show()
+                    
+                    
         # clustering result - representative spectra (cropped)
         # average all of the spectra in each cluster
         
