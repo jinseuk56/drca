@@ -806,14 +806,12 @@ def label_arrangement(label_arr, new_shape):
     reshape a clustering result obtained by performing OPTICS
     """
     label_sort = np.unique(label_arr)
-    #print(label_sort)
     num_label = len(label_sort)
     hist, edge = np.histogram(label_arr, bins=num_label)
-    #print(hist)
     label_reshape = reshape_coeff(label_arr.reshape(-1, 1), new_shape)
     
-    for i in range(len(label_reshape)):
-        label_reshape[i] = np.squeeze(label_reshape[i])
+    #for i in range(len(label_reshape)):
+    #    label_reshape[i] = np.squeeze(label_reshape[i])
         
     selected = []
     for i in range(num_label):
