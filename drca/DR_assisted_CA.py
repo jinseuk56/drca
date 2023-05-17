@@ -348,12 +348,61 @@ class DR_assisted_CA():
             alpha = np.ones_like(red)
             point_colors = np.stack((red, green, blue, alpha), axis=1)
 
-            fig, ax = plt.subplots(1, 1, figsize=(7, 7))
-            ax.scatter(r_point[1], r_point[0], s=10, c="red", marker="*")
-            ax.scatter(g_point[1], g_point[0], s=10, c="green", marker="*")
-            ax.scatter(b_point[1], b_point[0], s=10, c="blue", marker="*")
-            ax.scatter(X_shift[:, 1], X_shift[:, 0], s=3, c=point_colors)
-            ax.scatter(center[1], center[0], s=5, c="red", marker="D")
+            sectors = []
+            th_r = max_radius*3/5
+            center_r = max_radius*1/5
+            for i in range(len(X_shift)):
+                if ((X_shift[i, 0]**2 + X_shift[i, 1]**2 >= th_r**2) and 
+                    (X_shift[i, 0]**2 + X_shift[i, 1]**2 <= max_radius**2) and
+                    (X_shift[i, 1]/3**(1/2)+X_shift[i, 0] < 0) and
+                    (-X_shift[i, 1]/3**(1/2)+X_shift[i, 0] > 0)):
+                    sectors.append(0)
+
+                elif ((X_shift[i, 0]**2 + X_shift[i, 1]**2 >= th_r**2) and 
+                    (X_shift[i, 0]**2 + X_shift[i, 1]**2 <= max_radius**2) and
+                    (X_shift[i, 1]/3**(1/2)+X_shift[i, 0] > 0) and
+                    (X_shift[i, 1] < 0)):
+                    sectors.append(1)
+
+                elif ((X_shift[i, 0]**2 + X_shift[i, 1]**2 >= th_r**2) and 
+                    (X_shift[i, 0]**2 + X_shift[i, 1]**2 <= max_radius**2) and
+                    (-X_shift[i, 1]/3**(1/2)+X_shift[i, 0] > 0) and
+                    (X_shift[i, 1] > 0)):
+                    sectors.append(2)
+
+                elif ((X_shift[i, 0]**2 + X_shift[i, 1]**2 >= th_r**2) and 
+                    (X_shift[i, 0]**2 + X_shift[i, 1]**2 <= max_radius**2) and
+                    (X_shift[i, 1]/3**(1/2)+X_shift[i, 0] > 0) and
+                    (-X_shift[i, 1]/3**(1/2)+X_shift[i, 0] < 0)):
+                    sectors.append(3)     
+
+                elif ((X_shift[i, 0]**2 + X_shift[i, 1]**2 >= th_r**2) and 
+                    (X_shift[i, 0]**2 + X_shift[i, 1]**2 <= max_radius**2) and
+                    (X_shift[i, 1]/3**(1/2)+X_shift[i, 0] < 0) and
+                    (X_shift[i, 1] > 0)):
+                    sectors.append(4)
+
+                elif ((X_shift[i, 0]**2 + X_shift[i, 1]**2 >= th_r**2) and 
+                    (X_shift[i, 0]**2 + X_shift[i, 1]**2 <= max_radius**2) and
+                    (-X_shift[i, 1]/3**(1/2)+X_shift[i, 0] < 0) and
+                    (X_shift[i, 1] < 0)):
+                    sectors.append(5)
+
+                elif X_shift[i, 0]**2 + X_shift[i, 1]**2 < center_r**2:
+                    sectors.append(6)
+
+                else:
+                    sectors.append(-1)
+
+            sectors = np.asarray(sectors, dtype=np.int32)
+
+            fig, ax = plt.subplots(1, 2, figsize=(14, 7))
+            ax[0].scatter(r_point[1], r_point[0], s=10, c="red", marker="*")
+            ax[0].scatter(g_point[1], g_point[0], s=10, c="green", marker="*")
+            ax[0].scatter(b_point[1], b_point[0], s=10, c="blue", marker="*")
+            ax[0].scatter(X_shift[:, 1], X_shift[:, 0], s=3, c=point_colors)
+            ax[0].scatter(center[1], center[0], s=5, c="red", marker="D")
+            ax[1].scatter(X_shift[:, 1], X_shift[:, 0], s=3, c=sectors, cmap=custom_cmap, norm=norm)
             fig.tight_layout()
             plt.show()
 
@@ -375,6 +424,86 @@ class DR_assisted_CA():
                 fig.tight_layout()
                 plt.show()
 
+            sector_label = np.array([-1,0,1,2,3,4,5,6], dtype=np.int32)
+            num_sector = len(sector_label)
+
+            if self.dat_dim == 3:
+                self.sector_avg = np.zeros((num_sector, self.num_dim))
+
+                for i in range(num_sector):
+                    ind = np.where(sectors == sector_label[i])
+                    if len(ind[0]) != 0:
+                        self.sector_avg[i] = np.mean(self.dataset_flat[ind], axis=0)
+                    else:
+                        self.sector_avg[i] = np.zeros(self.num_dim)
+
+                fig, ax = plt.subplots(1, 2, figsize=(15, 8))
+
+                denominator = np.max(self.sector_avg, axis=1)
+                self.sector_avg = self.sector_avg / denominator[:, np.newaxis]
+
+                if -1 in sector_label:
+                    for i in range(1, num_sector):
+                        ax[0].plot(self.dat_dim_range, (self.sector_avg[i]), label="sector %d"%(i), c=color_rep[i])
+                        ax[1].plot(self.dat_dim_range, (self.sector_avg[i]+(i-1)*0.25), label="sector %d"%(i), c=color_rep[i])
+
+                else:
+                    for i in range(0, num_sector):
+                        ax[0].plot(self.dat_dim_range, (self.sector_avg[i]), label="sector %d"%(i+1), c=color_rep[i+1])
+                        ax[1].plot(self.dat_dim_range, (self.sector_avg[i]+i*0.25), label="sector %d"%(i+1), c=color_rep[i+1])
+
+                ax[0].legend(fontsize="x-large")
+                ax[0].set_xlabel(self.dat_unit)
+                ax[0].set_facecolor("lightgray")
+
+                ax[1].set_xlabel(self.dat_unit)
+                ax[1].set_facecolor("lightgray")
+
+                fig.tight_layout()
+                plt.show()
+                
+            elif self.dat_dim == 4:
+                self.sector_avg = np.zeros((num_sector, self.s_length))
+
+                for i in range(num_sector):
+                    ind = np.where(sectors == int(sector_label[i]))
+                    if len(ind[0]) != 0:
+                        self.sector_avg[i] = np.mean(self.dataset_flat[ind], axis=0)
+                    else:
+                        self.sector_avg[i] = np.zeros(self.s_length)
+
+                row_n = num_sector
+                col_n = 1
+                fig, ax = plt.subplots(row_n, col_n, figsize=(7, 50))
+
+
+                if self.radial_flat:
+                    for i, la in enumerate(sector_label):
+                        tmp = np.zeros((self.radial_range[1]*2, self.radial_range[1]*2))
+                        tmp[self.k_indy, self.k_indx] = self.sector_avg[i]
+
+                        ax[i].imshow(tmp, cmap="viridis")
+                        ax[i].axis("off")
+
+                        if la == -1:
+                            ax[i].set_title("not classfied")
+                        else:
+                            ax[i].set_title("sector %d"%(la)) 
+
+                else:
+                    for i, la in enumerate(sector_label):
+                        ax[i].imshow(self.sector_avg[i].reshape((self.w_size*2, self.w_size*2)), cmap="viridis")
+                        ax[i].axis("off")
+                        if la == -1:
+                            ax[i].set_title("not classified")
+                        else:
+                            ax[i].set_title("sector %d"%(la))
+
+                fig.tight_layout()
+                plt.show()
+
+
+            """
             XY = np.zeros((X_shift.shape[0], 3,), dtype=float)
             dist_scale = dist_from_center / max_radius
             for i in range(X_shift.shape[0]):
@@ -407,7 +536,8 @@ class DR_assisted_CA():
                 ax.imshow(self.wheel_reshape[j])
                 ax.axis("off")
                 fig.tight_layout()
-                plt.show()            
+                plt.show()
+            """            
             
 
     def cluster_analysis(self, method="optics", ini_params=None):
@@ -653,14 +783,12 @@ def data_load_3d(adr, crop=None, rescale=True, DM_file=True):
                 temp = temp.data
                 if rescale:
                     temp = temp/np.max(temp)
-                temp = temp.clip(min=0.0)
                 print(temp.shape)
                 
             else:
                 temp = hys.load(ad).data
                 if rescale:
                     temp = temp/np.max(temp)
-                temp = temp.clip(min=0.0)
                 print(temp.shape)
         
         else:
@@ -669,14 +797,12 @@ def data_load_3d(adr, crop=None, rescale=True, DM_file=True):
                 temp = temp[:, :, crop[0]:crop[1]]
                 if rescale:
                     temp = temp/np.max(temp)
-                temp = temp.clip(min=0.0)
                 print(temp.shape)
                 
             else:
                 temp = tifffile.imread(ad)
                 if rescale:
                     temp = temp/np.max(temp)
-                temp = temp.clip(min=0.0)
                 print(temp.shape)                
                 
         shape.append(temp.shape)
@@ -693,8 +819,15 @@ def data_load_4d(adr, rescale=False):
         tmp = tifffile.imread(ad)
         if rescale:
             tmp = tmp / np.max(tmp)
-        tmp = tmp.clip(min=0.0)
         print(tmp.shape)
+        if len(tmp.shape) == 3:
+            try:
+                tmp = tmp.reshape(int(tmp.shape[0]**(1/2)), int(tmp.shape[0]**(1/2)), tmp.shape[1], tmp.shape[2])
+                print("The scanning shape is automatically corrected")
+            except:
+                print("The input data is not 4-dimensional")
+                print("Please confirm that all options are correct")
+            
         shape.append(list(tmp.shape[:2]))
         storage.append(tmp)
     
