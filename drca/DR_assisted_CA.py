@@ -112,11 +112,12 @@ class DR_assisted_CA():
                 ax.axis("off")
                 plt.show()
         
+        self.center_removed = False
         if center_remove != 0:
             self.center_removed = True
             data_cr = []
             for i in range(self.num_img):
-                ri = radial_indices(self.data_storage[i].shape[2:], [center_remove, 100], center=self.center_pos[i])
+                ri = radial_indices(self.data_storage[i].shape[2:], [center_remove, np.max(self.data_shape[2:])], center=self.center_pos[i])
                 data_cr.append(np.multiply(self.data_storage[i], ri))
                 
             self.data_storage = data_cr
@@ -828,7 +829,7 @@ def data_load_4d(adr, rescale=False):
                 print("The input data is not 4-dimensional")
                 print("Please confirm that all options are correct")
             
-        shape.append(list(tmp.shape[:2]))
+        shape.append(list(tmp.shape))
         storage.append(tmp)
     
     shape = np.asarray(shape)
