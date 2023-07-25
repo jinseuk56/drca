@@ -779,7 +779,7 @@ def data_load_3d(adr, crop=None, rescale=True, DM_file=True):
         if DM_file:
             if crop:
                 temp = hys.load(ad)
-                print(temp.axes_manager[2])
+                print(temp.axes_manager)
                 temp = temp.isig[crop[0]:crop[1]]
                 temp = temp.data
                 if rescale:
