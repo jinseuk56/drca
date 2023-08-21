@@ -1,3 +1,7 @@
 **/.ipynb_checkpoints/
 __pycache__/
 test/
+build/
+dist/
+.eggs/
+drca.egg-info/
