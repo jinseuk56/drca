@@ -647,18 +647,18 @@ class DR_assisted_CA():
     def clustering_result(self, tf_map=False, normalize='max', log_scale=True):
         
         self.clustering_widgets.widget.close_all()
-        label_selected = self.clustering_widgets.widget.result
-        label_sort = np.unique(label_selected)
-        self.label_reshape, selected, hist = label_arrangement(label_selected, self.data_shape)
-        num_label = len(label_sort)
-        print(label_sort) # label "-1" -> not a cluster
+        self.label_selected = self.clustering_widgets.widget.result
+        self.label_sort = np.unique(self.label_selected)
+        self.label_reshape, selected, hist = label_arrangement(self.label_selected, self.data_shape)
+        self.num_label = len(self.label_sort)
+        print(self.label_sort) # label "-1" -> not a cluster
         print(hist) # number of data points in each cluster
         
         fig, ax = plt.subplots(1, 1, figsize=(5, 5))
         for klass, color in zip(range(0, len(color_rep)), color_rep[1:]):
-            Xo = self.X[label_selected == klass]
+            Xo = self.X[self.label_selected == klass]
             ax.scatter(Xo[:, 0], Xo[:, 1], color=color, alpha=0.3, marker='.')
-        ax.plot(self.X[label_selected == -1, 0], self.X[label_selected == -1, 1], 'k+', alpha=0.1)
+        ax.plot(self.X[self.label_selected == -1, 0], self.X[self.label_selected == -1, 1], 'k+', alpha=0.1)
         fig.tight_layout()
         plt.show()
         
@@ -676,10 +676,10 @@ class DR_assisted_CA():
         
         if tf_map:
             for i in range(self.num_img):
-                fig, ax = plt.subplots(1, num_label, figsize=(3*num_label, 3))
-                for j in range(num_label):
+                fig, ax = plt.subplots(1, self.num_label, figsize=(3*self.num_label, 3))
+                for j in range(self.num_label):
                     ax[j].imshow(selected[j][i], cmap="afmhot")
-                    ax[j].set_title("label %d map"%(label_sort[j]+1), fontsize=10)
+                    ax[j].set_title("label %d map"%(self.label_sort[j]+1), fontsize=10)
                     ax[j].axis("off")
                     fig.tight_layout()
                 plt.show()
@@ -689,11 +689,11 @@ class DR_assisted_CA():
         # average all of the spectra in each cluster
         
         if self.dat_dim == 3:
-            self.lines = np.zeros((num_label, self.num_dim))
+            self.lines = np.zeros((self.num_label, self.num_dim))
 
-            for i in range(num_label):
-                ind = np.where(label_selected == label_sort[i])
-                print("number of pixels in the label %d cluster: %d"%(label_sort[i], hist[i]))
+            for i in range(self.num_label):
+                ind = np.where(self.label_selected == self.label_sort[i])
+                print("number of pixels in the label %d cluster: %d"%(self.label_sort[i], hist[i]))
                 self.lines[i] = np.mean(self.dataset_flat[ind], axis=0)
 
             fig, ax = plt.subplots(1, 2, figsize=(15, 8))
@@ -705,13 +705,13 @@ class DR_assisted_CA():
                 denominator = np.min(self.lines, axis=1)
             self.lines = self.lines / denominator[:, np.newaxis]
 
-            if -1 in label_sort:
-                for i in range(1, num_label):
+            if -1 in self.label_sort:
+                for i in range(1, self.num_label):
                     ax[0].plot(self.dat_dim_range, (self.lines[i]), label="cluster %d"%(i), c=color_rep[i])
                     ax[1].plot(self.dat_dim_range, (self.lines[i]+(i-1)*0.25), label="cluster %d"%(i), c=color_rep[i])
 
             else:
-                for i in range(0, num_label):
+                for i in range(0, self.num_label):
                     ax[0].plot(self.dat_dim_range, (self.lines[i]), label="cluster %d"%(i+1), c=color_rep[i+1])
                     ax[1].plot(self.dat_dim_range, (self.lines[i]+i*0.25), label="cluster %d"%(i+1), c=color_rep[i+1])
 
@@ -726,20 +726,20 @@ class DR_assisted_CA():
             plt.show()
             
         elif self.dat_dim == 4:
-            self.lines = np.zeros((num_label, self.s_length))
+            self.lines = np.zeros((self.num_label, self.s_length))
 
-            for i in range(num_label):
-                ind = np.where(label_selected == label_sort[i])
-                print("number of pixels in the label %d cluster: %d"%(label_sort[i], hist[i]))
+            for i in range(self.num_label):
+                ind = np.where(self.label_selected == self.label_sort[i])
+                print("number of pixels in the label %d cluster: %d"%(self.label_sort[i], hist[i]))
                 self.lines[i] = np.mean(self.dataset_flat[ind], axis=0)
 
-            row_n = num_label
+            row_n = self.num_label
             col_n = 1
             fig, ax = plt.subplots(row_n, col_n, figsize=(7, 50))
 
 
             if self.radial_flat:
-                for i, la in enumerate(label_sort):
+                for i, la in enumerate(self.label_sort):
                     tmp = np.zeros((self.radial_range[1]*2, self.radial_range[1]*2))
                     tmp[self.k_indy, self.k_indx] = self.lines[i]
 
@@ -752,7 +752,7 @@ class DR_assisted_CA():
                         ax[i].set_title("cluster %d"%(la+1)) 
 
             else:
-                for i, la in enumerate(label_sort):
+                for i, la in enumerate(self.label_sort):
                     if log_scale:
                         ax[i].imshow(np.log(self.lines[i].reshape((self.w_size*2, self.w_size*2))), cmap="viridis") # log scale - optional
                     else:
