@@ -213,7 +213,7 @@ class DR_assisted_CA():
         self.dataset_input = dataset_flat[self.ri]
         self.dataset_input = self.dataset_input.astype(np.float32)
         
-    def ini_DR(self, method="nmf", num_comp=5, result_visual=True):
+    def ini_DR(self, method="nmf", num_comp=5, result_visual=True, intensity_range = "absolute"):
         self.DR_num_comp = num_comp
         if method=="nmf":
             self.DR = NMF(n_components=num_comp, init="nndsvda", solver="mu", max_iter=2000, verbose=True)
@@ -274,17 +274,29 @@ class DR_assisted_CA():
                         ax.axis("off")
                         fig.tight_layout()
                         plt.show()
-            
-            min_val = np.min(coeffs)
-            max_val = np.max(coeffs)
-            for i in range(self.num_img):
-                fig, ax = plt.subplots(1, self.DR_num_comp, figsize=(5*self.DR_num_comp, 5))
-                for j in range(self.DR_num_comp):
-                    tmp = ax[j].imshow(self.coeffs_reshape[i][:, :, j], vmin=min_val, vmax=max_val, cmap="inferno")
-                    ax[j].set_title("loading vector %d map"%(j+1), fontsize=10)
-                    ax[j].axis("off")
-                    fig.colorbar(tmp, cax=fig.add_axes([0.92, 0.15, 0.04, 0.7]))
-                plt.show()
+
+            if intensity_range == "relative":
+                for i in range(self.num_img):
+                    fig, ax = plt.subplots(1, self.DR_num_comp, figsize=(5*self.DR_num_comp, 5))
+                    for j in range(self.DR_num_comp):
+                        tmp = ax[j].imshow(self.coeffs_reshape[i][:, :, j], cmap="inferno")
+                        ax[j].set_title("loading vector %d map"%(j+1), fontsize=10)
+                        ax[j].axis("off")
+                        fig.colorbar(tmp, cax=fig.add_axes([0.92, 0.15, 0.04, 0.7]))
+                    fig.suptitle(self.file_adr[i])
+                    plt.show()
+            else:               
+                min_val = np.min(coeffs)
+                max_val = np.max(coeffs)
+                for i in range(self.num_img):
+                    fig, ax = plt.subplots(1, self.DR_num_comp, figsize=(5*self.DR_num_comp, 5))
+                    for j in range(self.DR_num_comp):
+                        tmp = ax[j].imshow(self.coeffs_reshape[i][:, :, j], vmin=min_val, vmax=max_val, cmap="inferno")
+                        ax[j].set_title("loading vector %d map"%(j+1), fontsize=10)
+                        ax[j].axis("off")
+                        fig.colorbar(tmp, cax=fig.add_axes([0.92, 0.15, 0.04, 0.7]))
+                    fig.suptitle(self.file_adr[i])
+                    plt.show()
 
                     
     def aug_DR(self, num_comp, method="tsne", perplex=[50]):
