@@ -22,8 +22,7 @@ title = {Dimensionality reduction and unsupervised clustering for EELS-SI},<br>
 journal = {Ultramicroscopy},<br>
 volume = {231},<br>
 pages = {113314},<br>
-year = {2021},<br>
-}
+year = {2021}}
 
 ___
-Jinseok Ryu ([jinseuk56@gmail.com](mailto:jinseuk56@gmail.com)), Ph.D.
+Jinseok Ryu, Ph.D. ([jinseuk56@gmail.com](mailto:jinseuk56@gmail.com))
