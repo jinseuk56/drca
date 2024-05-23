@@ -26,7 +26,4 @@ year = {2021},<br>
 }
 
 ___
-Jinseok Ryu ([jinseuk56@gmail.com](mailto:jinseuk56@gmail.com)), Ph.D.  
-Electron Microscopy and Spectroscopy Lab.  
-Dept. of Materials Science and Engineering  
-Seoul National University  
+Jinseok Ryu ([jinseuk56@gmail.com](mailto:jinseuk56@gmail.com)), Ph.D.
