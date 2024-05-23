@@ -5,12 +5,12 @@ Dimensionality-reduction-assisted cluster analysis for STEM-derived multi-dimens
 ___
 
 ### How to install
-<code>pip install hyperspy==1.6.4  
+<code>pip install hyperspy
 conda install -c conda-forge scikit-learn  
 conda install -c conda-forge matplotlib  
 conda install -c conda-forge jupyterlab  
 pip install drca  
-pip install ipympl  
+pip install ipympl
 </code>
 
 ___
