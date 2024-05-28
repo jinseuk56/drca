@@ -43,7 +43,7 @@ sm.set_array([])
 cm_rep = ["gray", "Reds", "Greens", "Blues", "Oranges", "Purples"]  
     
 class DR_assisted_CA():
-    def __init__(self, adr, dat_dim, dat_unit, cr_range=None, dat_scale=1, rescale=True, DM_file=True):
+    def __init__(self, adr, dat_dim, dat_unit, cr_range=None, dat_scale=1, rescale=True, DM_file=True, verbose=True):
         self.file_adr = adr
         self.num_img = len(adr)
         self.dat_dim = dat_dim
@@ -57,10 +57,10 @@ class DR_assisted_CA():
             self.num_dim = len(self.dat_dim_range)
         
         if dat_dim == 3:
-            self.data_storage, self.data_shape = data_load_3d(adr, cr_range, rescale, DM_file)
+            self.data_storage, self.data_shape = data_load_3d(adr, cr_range, rescale, DM_file, verbose)
         
         else:
-            self.data_storage, self.data_shape = data_load_4d(adr, rescale)
+            self.data_storage, self.data_shape = data_load_4d(adr, rescale, verbose)
             
         self.original_data_shape = self.data_shape.copy()
              
@@ -781,7 +781,7 @@ class DR_assisted_CA():
 #####################################################
 # functions #
 #####################################################
-def data_load_3d(adr, crop=None, rescale=True, DM_file=True):
+def data_load_3d(adr, crop=None, rescale=True, DM_file=True, verbose=True):
     """
     load a spectrum image
     """
@@ -791,18 +791,16 @@ def data_load_3d(adr, crop=None, rescale=True, DM_file=True):
         if DM_file:
             if crop:
                 temp = hys.load(ad)
-                print(temp.axes_manager)
+                #print(temp.axes_manager)
                 temp = temp.isig[crop[0]:crop[1]]
                 temp = temp.data
                 if rescale:
                     temp = temp/np.max(temp)
-                print(temp.shape)
                 
             else:
                 temp = hys.load(ad).data
                 if rescale:
                     temp = temp/np.max(temp)
-                print(temp.shape)
         
         else:
             if crop:
@@ -810,14 +808,15 @@ def data_load_3d(adr, crop=None, rescale=True, DM_file=True):
                 temp = temp[:, :, crop[0]:crop[1]]
                 if rescale:
                     temp = temp/np.max(temp)
-                print(temp.shape)
                 
             else:
                 temp = tifffile.imread(ad)
                 if rescale:
-                    temp = temp/np.max(temp)
-                print(temp.shape)                
-                
+                    temp = temp/np.max(temp)               
+
+        if verbose:
+            print(ad)
+            print(temp.shape)
         shape.append(temp.shape)
         storage.append(temp)       
     
@@ -825,14 +824,13 @@ def data_load_3d(adr, crop=None, rescale=True, DM_file=True):
     return storage, shape
 
 
-def data_load_4d(adr, rescale=False):
+def data_load_4d(adr, rescale=False, verbose=True):
     storage = []
     shape = []   
     for i, ad in enumerate(adr):
         tmp = tifffile.imread(ad)
         if rescale:
             tmp = tmp / np.max(tmp)
-        print(tmp.shape)
         if len(tmp.shape) == 3:
             try:
                 tmp = tmp.reshape(int(tmp.shape[0]**(1/2)), int(tmp.shape[0]**(1/2)), tmp.shape[1], tmp.shape[2])
@@ -840,7 +838,10 @@ def data_load_4d(adr, rescale=False):
             except:
                 print("The input data is not 4-dimensional")
                 print("Please confirm that all options are correct")
-            
+
+        if verbose:
+            print(ad)
+            print(tmp.shape)
         shape.append(list(tmp.shape))
         storage.append(tmp)
     
