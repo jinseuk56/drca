@@ -5,12 +5,12 @@ Dimensionality-reduction-assisted cluster analysis for STEM-derived multi-dimens
 ___
 
 ### How to install
-<code>pip install hyperspy==1.6.4  
+<code>pip install hyperspy
 conda install -c conda-forge scikit-learn  
 conda install -c conda-forge matplotlib  
 conda install -c conda-forge jupyterlab  
 pip install drca  
-pip install ipympl  
+pip install ipympl
 </code>
 
 ___
@@ -22,11 +22,7 @@ title = {Dimensionality reduction and unsupervised clustering for EELS-SI},<br>
 journal = {Ultramicroscopy},<br>
 volume = {231},<br>
 pages = {113314},<br>
-year = {2021},<br>
-}
+year = {2021}}
 
 ___
-Jinseok Ryu ([jinseuk56@gmail.com](mailto:jinseuk56@gmail.com)), Ph.D.  
-Electron Microscopy and Spectroscopy Lab.  
-Dept. of Materials Science and Engineering  
-Seoul National University  
+Jinseok Ryu, Ph.D. ([jinseuk56@gmail.com](mailto:jinseuk56@gmail.com))
