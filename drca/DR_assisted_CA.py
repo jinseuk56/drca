@@ -246,11 +246,10 @@ class DR_assisted_CA():
                 fig, ax = plt.subplots(1, 1, figsize=(6, 4)) # all loading vectors
                 for i in range(self.DR_num_comp):
                     ax.plot(self.dat_dim_range, self.DR_comp_vectors[i], "-", c=color_rep[i+1], label="loading vector %d"%(i+1))
-                ax.grid()
                 ax.legend(fontsize="large")
                 ax.set_xlabel(self.dat_unit, fontsize=10)
                 ax.tick_params(axis="x", labelsize=10)
-                ax.axes.get_yaxis().set_visible(False)
+                ax.set_facecolor("lightgray")
 
                 fig.tight_layout()
                 plt.show()
