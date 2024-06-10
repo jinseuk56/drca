@@ -5,8 +5,7 @@ Dimensionality-reduction-assisted cluster analysis for STEM-derived multi-dimens
 ___
 
 ### How to install
-<code> 
-pip install drca  
+<code>pip install drca  
 </code>
 
 ___
