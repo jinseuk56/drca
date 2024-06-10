@@ -8,7 +8,7 @@ setup(
     author_email='jinseuk56@gmail.com',
     url='https://github.com/jinseuk56',
     packages=find_packages(include=['drca']),
-    install_requires=['numpy', 'matplotlib', 'scikit-learn', 'ipywidgets', 'tifffile']
+    install_requires=['numpy', 'matplotlib', 'scikit-learn', 'ipywidgets', 'tifffile'],
     setup_requires=['pytest-runner', 'flake8'],
     tests_require=['pytest']
 )
