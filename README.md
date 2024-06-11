@@ -1,12 +1,11 @@
-# DR_assisted_cluster_analysis
+# DR-assisted Cluster Analysis
 
 Dimensionality-reduction-assisted cluster analysis for STEM-derived multi-dimensional data (EELS-SI, 4D-STEM)
 
 ___
 
 ### How to install
-<code> 
-pip install drca  
+<code>pip install drca  
 </code>
 
 ___
