@@ -133,7 +133,7 @@ class DR_assisted_CA():
                     ax.axis("off")
                     plt.show()
                     
-    def make_input(self, min_val=0.0, max_normalize=True, rescale_0to1=False, log_scale=False, radial_flat=True, w_size=0, radial_range=None):
+    def make_input(self, min_val=0.0, max_normalize=True, rescale_0to1=False, log_scale=False, radial_flat=True, w_size=0, radial_range=None, final_dim=1):
 
         dataset_flat = []
         if self.dat_dim == 3:
@@ -163,6 +163,7 @@ class DR_assisted_CA():
                     self.a_ind.extend(tmp_a.tolist())
 
                 self.s_length = len(self.k_indx)
+                
 
                 for i in range(self.num_img):
                     flattened = circle_flatten(self.data_storage[i], radial_range, self.center_pos[i])
@@ -176,18 +177,31 @@ class DR_assisted_CA():
                     fig.tight_layout()
                     plt.show()
 
-                    dataset.append(flattened) 
+                    dataset.append(flattened)
+                    
+                for i in range(self.num_img):
+                    print(dataset[i].shape)
+                    dataset_flat.extend(dataset[i].reshape(-1, self.s_length))
                 
+                    
             else:
                 for i in range(self.num_img):
                     flattened = flattening(self.data_storage[i], flat_option="box", crop_dist=w_size, c_pos=self.center_pos[i])
-                    dataset.append(flattened)
-
+                    if final_dim == 1:
+                        dataset.append(flattened)
+                    elif final_dim == 2:
+                        dataset.append(flattened.reshape(self.data_shape[i][0], self.data_shape[i][1], self.w_size*2, self.w_size*2))
+                    else:
+                        print("Warning! 'final_dim' must be 1 or 2")
                 self.s_length = (w_size*2)**2
                 
-            for i in range(self.num_img):
-                print(dataset[i].shape)
-                dataset_flat.extend(dataset[i].reshape(-1, self.s_length))
+                for i in range(self.num_img):
+                    print(dataset[i].shape)
+                    if final_dim == 1:
+                        dataset_flat.extend(dataset[i].reshape(-1, self.s_length))
+                    else:
+                        dataset_flat.extend(dataset[i].reshape(-1, self.w_size*2, self.w_size*2))
+                    
             dataset_flat = np.asarray(dataset_flat)
             print(dataset_flat.shape)
             
@@ -197,18 +211,22 @@ class DR_assisted_CA():
             print(np.min(dataset_flat), np.max(dataset_flat))
             
         if max_normalize:
-            dataset_flat = dataset_flat / np.max(dataset_flat, axis=1)[:, np.newaxis]
+            if final_dim == 1:
+                print(np.max(dataset_flat, axis=1).shape)
+                dataset_flat = dataset_flat / np.max(dataset_flat, axis=1)[:, np.newaxis]
+            else:
+                dataset_flat = dataset_flat / np.max(dataset_flat, axis=(1,2))[:, np.newaxis, np.newaxis]
             print(np.min(dataset_flat), np.max(dataset_flat))
             
         if rescale_0to1:
             for i in range(len(dataset_flat)):
                 dataset_flat[i] = zero_one_rescale(dataset_flat[i])
-            
+                
         dataset_flat = dataset_flat.clip(min=min_val)
         print(np.min(dataset_flat), np.max(dataset_flat))
-        total_num = len(dataset_flat)
+        self.total_num = len(dataset_flat)
         self.dataset_flat = dataset_flat
-        self.ri = np.random.choice(total_num, total_num, replace=False)
+        self.ri = np.random.choice(self.total_num, self.total_num, replace=False)
 
         self.dataset_input = dataset_flat[self.ri]
         self.dataset_input = self.dataset_input.astype(np.float32)
