@@ -2,7 +2,6 @@
 # Jinseok Ryu (jinseuk56@gmail.com)
 # https://doi.org/10.1016/j.ultramic.2021.113314
 
-
 import numpy as np
 import tifffile
 
@@ -42,7 +41,7 @@ sm.set_array([])
 
 cm_rep = ["gray", "Reds", "Greens", "Blues", "Oranges", "Purples"]  
     
-class DR_assisted_CA():
+class drca():
     def __init__(self, adr, dat_dim, dat_unit, cr_range=None, dat_scale=1, rescale=True, DM_file=True, verbose=True):
         self.file_adr = adr
         self.num_img = len(adr)
