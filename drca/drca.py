@@ -62,6 +62,28 @@ class drca():
             self.data_storage, self.data_shape = data_load_4d(adr, rescale, verbose)
             
         self.original_data_shape = self.data_shape.copy()
+
+        if len(self.dat_dim_range) > self.original_data_shape[0, 2]:
+            difference = len(self.dat_dim_range) - self.original_data_shape[0, 2]
+            self.dat_dim_range = self.dat_dim_range[:-difference]
+            self.num_dim = len(self.dat_dim_range)
+            print("Data shape")
+            print(self.original_data_shape)
+            print("Spectrum length: %d"%self.num_dim)
+
+        elif len(self.dat_dim_range) < self.original_data_shape[0, 2]:
+            difference = self.original_data_shape[0, 2] - len(self.dat_dim_range)
+            self.dat_dim_range = np.arange(cr_range[0], cr_range[1]+difference*cr_range[2], cr_range[2]) * dat_scale
+            self.num_dim = len(self.dat_dim_range)
+            print("Data shape")
+            print(self.original_data_shape)
+            print("Spectrum length: %d"%self.num_dim)
+
+        else:
+            print("Data shape")
+            print(self.original_data_shape)
+            print("Spectrum length: %d"%self.num_dim)
+
              
     def binning(self, bin_y, bin_x, str_y, str_x, offset=0, rescale_0to1=True):
         dataset = []
