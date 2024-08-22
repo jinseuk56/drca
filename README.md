@@ -18,7 +18,7 @@ journal = {Ultramicroscopy},<br>
 volume = {231},<br>
 pages = {113314},<br>
 year = {2021},<br>
-doi = {doi.org/10.1016/j.ultramic.2021.113314}}
+doi = {[doi.org/10.1016/j.ultramic.2021.113314](https://doi.org/10.1016/j.ultramic.2021.113314)}}
 
 ___
 Jinseok Ryu, Ph.D. ([jinseuk56@gmail.com](mailto:jinseuk56@gmail.com))
