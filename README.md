@@ -17,7 +17,7 @@ title = {Dimensionality reduction and unsupervised clustering for EELS-SI},<br>
 journal = {Ultramicroscopy},<br>
 volume = {231},<br>
 pages = {113314},<br>
-year = {2021}
+year = {2021},<br>
 doi = {doi.org/10.1016/j.ultramic.2021.113314}}
 
 ___
