@@ -20,7 +20,7 @@ import ipywidgets as pyw
 import time
 
 try:
-    import hyperspy.api as hys
+    import hyperspy.api as hs
 except:
     print("Hyperspy cannot be imported")
     print("DM files not supported")
@@ -830,7 +830,7 @@ def data_load_3d(adr, crop=None, rescale=True, DM_file=True, verbose=True):
     for i, ad in enumerate(adr):
         if DM_file:
             if crop:
-                temp = hys.load(ad)
+                temp = hs.load(ad)
                 #print(temp.axes_manager)
                 temp = temp.isig[crop[0]:crop[1]]
                 temp = temp.data
@@ -838,7 +838,7 @@ def data_load_3d(adr, crop=None, rescale=True, DM_file=True, verbose=True):
                     temp = temp/np.max(temp)
                 
             else:
-                temp = hys.load(ad).data
+                temp = hs.load(ad).data
                 if rescale:
                     temp = temp/np.max(temp)
         
