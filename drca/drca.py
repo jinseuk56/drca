@@ -25,24 +25,26 @@ except:
     print("Hyperspy cannot be imported")
     print("DM files not supported")
     
-# create a customized colorbar
-color_rep = ["black", "red", "green", "blue", "orange", "purple", "yellow", "lime", 
-             "cyan", "magenta", "lightgray", "peru", "springgreen", "deepskyblue", 
-             "hotpink", "darkgray"]
 
-rgb_rep = {"black":[1,1,1,1], "red":[1,0,0,1], "green":[0,1,0,1], "blue":[0,0,1,1], "orange":[1,0.5,0,1], "purple":[1,0,1,1],
-           "yellow":[1,1,0,1], "lime":[0,1,0.5,1], "cyan":[0,1,1,1]}
-
-custom_cmap = mcolors.ListedColormap(color_rep)
-bounds = np.arange(-1, len(color_rep))
-norm = mcolors.BoundaryNorm(boundaries=bounds, ncolors=len(color_rep))
-sm = cm.ScalarMappable(cmap=custom_cmap, norm=norm)
-sm.set_array([])
-
-cm_rep = ["gray", "Reds", "Greens", "Blues", "Oranges", "Purples"]  
-    
 class drca():
     def __init__(self, adr, dat_dim, dat_unit, cr_range=None, dat_scale=1, rescale=True, DM_file=True, verbose=True):
+        # create a customized colorbar
+        self.color_rep = ["black", "red", "green", "blue", "orange", "purple", "yellow", "lime", 
+                    "cyan", "magenta", "lightgray", "peru", "springgreen", "deepskyblue", 
+                    "hotpink", "darkgray"]
+
+        self.rgb_rep = {"black":[1,1,1,1], "red":[1,0,0,1], "green":[0,1,0,1], "blue":[0,0,1,1], "orange":[1,0.5,0,1], "purple":[1,0,1,1],
+                "yellow":[1,1,0,1], "lime":[0,1,0.5,1], "cyan":[0,1,1,1]}
+
+        self.custom_cmap = mcolors.ListedColormap(self.color_rep)
+        bounds = np.arange(-1, len(self.color_rep))
+        self.norm = mcolors.BoundaryNorm(boundaries=bounds, ncolors=len(self.color_rep))
+        sm = cm.ScalarMappable(cmap=self.custom_cmap, norm=self.norm)
+        sm.set_array([])
+
+        self.cm_rep = ["gray", "Reds", "Greens", "Blues", "Oranges", "Purples"]  
+
+        # load data
         self.file_adr = adr
         self.num_img = len(adr)
         self.dat_dim = dat_dim
@@ -284,7 +286,7 @@ class drca():
             if self.dat_dim == 3:
                 fig, ax = plt.subplots(1, 1, figsize=(6, 4)) # all loading vectors
                 for i in range(self.DR_num_comp):
-                    ax.plot(self.dat_dim_range, self.DR_comp_vectors[i], "-", c=color_rep[i+1], label="loading vector %d"%(i+1))
+                    ax.plot(self.dat_dim_range, self.DR_comp_vectors[i], "-", c=self.color_rep[i+1], label="loading vector %d"%(i+1))
                 ax.legend(fontsize="large")
                 ax.set_xlabel(self.dat_unit, fontsize=10)
                 ax.tick_params(axis="x", labelsize=10)
@@ -453,7 +455,7 @@ class drca():
             ax[0].scatter(b_point[1], b_point[0], s=10, c="blue", marker="*")
             ax[0].scatter(X_shift[:, 1], X_shift[:, 0], s=3, c=point_colors)
             ax[0].scatter(center[1], center[0], s=5, c="red", marker="D")
-            ax[1].scatter(X_shift[:, 1], X_shift[:, 0], s=3, c=sectors, cmap=custom_cmap, norm=norm)
+            ax[1].scatter(X_shift[:, 1], X_shift[:, 0], s=3, c=sectors, cmap=self.custom_cmap, norm=self.norm)
             fig.tight_layout()
             plt.show()
 
@@ -495,13 +497,13 @@ class drca():
 
                 if -1 in sector_label:
                     for i in range(1, num_sector):
-                        ax[0].plot(self.dat_dim_range, (self.sector_avg[i]), label="sector %d"%(i), c=color_rep[i])
-                        ax[1].plot(self.dat_dim_range, (self.sector_avg[i]+(i-1)*0.25), label="sector %d"%(i), c=color_rep[i])
+                        ax[0].plot(self.dat_dim_range, (self.sector_avg[i]), label="sector %d"%(i), c=self.color_rep[i])
+                        ax[1].plot(self.dat_dim_range, (self.sector_avg[i]+(i-1)*0.25), label="sector %d"%(i), c=self.color_rep[i])
 
                 else:
                     for i in range(0, num_sector):
-                        ax[0].plot(self.dat_dim_range, (self.sector_avg[i]), label="sector %d"%(i+1), c=color_rep[i+1])
-                        ax[1].plot(self.dat_dim_range, (self.sector_avg[i]+i*0.25), label="sector %d"%(i+1), c=color_rep[i+1])
+                        ax[0].plot(self.dat_dim_range, (self.sector_avg[i]), label="sector %d"%(i+1), c=self.color_rep[i+1])
+                        ax[1].plot(self.dat_dim_range, (self.sector_avg[i]+i*0.25), label="sector %d"%(i+1), c=self.color_rep[i+1])
 
                 ax[0].legend(fontsize="x-large")
                 ax[0].set_xlabel(self.dat_unit)
@@ -647,7 +649,7 @@ class drca():
             labels = clust.labels_[clust.ordering_]
             print("activated?")
         
-            for klass, color in zip(range(0, len(color_rep)), color_rep[1:]):
+            for klass, color in zip(range(0, len(self.color_rep)), self.color_rep[1:]):
                 Xk = space[labels == klass]
                 Rk = reachability[labels == klass]
                 self.ax1.plot(Xk, Rk, color, alpha=0.3)
@@ -661,14 +663,14 @@ class drca():
             labels = clust.labels_
             self.labels = labels
             if self.num_comp_vis == 3:
-                for klass, color in zip(range(0, len(color_rep)), color_rep[1:]):
+                for klass, color in zip(range(0, len(self.color_rep)), self.color_rep[1:]):
                     Xo = self.X[labels == klass]
                     self.ax2.scatter(Xo[:, 0], Xo[:, 1], Xo[:, 2], color=color, alpha=0.3, marker='.')
                 self.ax2.plot(self.X[labels == -1, 0], self.X[labels == -1, 1], self.X[labels == -1, 2], 'k+', alpha=0.1)
                 self.ax2.set_title('Automatic Clustering\nOPTICS(# of clusters=%d)\n(%f, %f, %f)'%(len(np.unique(labels)), msample, steep, msize))
 
             elif self.num_comp_vis == 2:
-                for klass, color in zip(range(0, len(color_rep)), color_rep[1:]):
+                for klass, color in zip(range(0, len(self.color_rep)), self.color_rep[1:]):
                     Xo = self.X[labels == klass]
                     self.ax2.scatter(Xo[:, 0], Xo[:, 1], color=color, alpha=0.3, marker='.')
                 self.ax2.plot(self.X[labels == -1, 0], self.X[labels == -1, 1], 'k+', alpha=0.1)
@@ -678,7 +680,7 @@ class drca():
         
         label_reshape, _, _ = label_arrangement(self.labels, self.data_shape)
 
-        self.ax3.imshow(label_reshape[img_sel-1], cmap=custom_cmap, norm=norm)
+        self.ax3.imshow(label_reshape[img_sel-1], cmap=self.custom_cmap, norm=self.norm)
         self.ax3.set_title("image %d"%(img_sel), fontsize=10)
         self.ax3.axis("off")
 
@@ -705,7 +707,7 @@ class drca():
         print(hist) # number of data points in each cluster
         
         fig, ax = plt.subplots(1, 1, figsize=(5, 5))
-        for klass, color in zip(range(0, len(color_rep)), color_rep[1:]):
+        for klass, color in zip(range(0, len(self.color_rep)), self.color_rep[1:]):
             Xo = self.X[self.label_selected == klass]
             ax.scatter(Xo[:, 0], Xo[:, 1], color=color, alpha=0.3, marker='.')
         ax.plot(self.X[self.label_selected == -1, 0], self.X[self.label_selected == -1, 1], 'k+', alpha=0.1)
@@ -717,7 +719,7 @@ class drca():
         
         for i in range(self.num_img):
             fig, ax = plt.subplots(1, 1, figsize=(8, 8))
-            ax.imshow(self.label_reshape[i], cmap=custom_cmap, norm=norm)
+            ax.imshow(self.label_reshape[i], cmap=self.custom_cmap, norm=self.norm)
             ax.set_title("image %d"%(i+1), fontsize=10)
             ax.axis("off")
             fig.tight_layout()
@@ -757,13 +759,13 @@ class drca():
 
             if -1 in self.label_sort:
                 for i in range(1, self.num_label):
-                    ax[0].plot(self.dat_dim_range, (self.lines[i]), label="cluster %d"%(i), c=color_rep[i])
-                    ax[1].plot(self.dat_dim_range, (self.lines[i]+(i-1)*0.25), label="cluster %d"%(i), c=color_rep[i])
+                    ax[0].plot(self.dat_dim_range, (self.lines[i]), label="cluster %d"%(i), c=self.color_rep[i])
+                    ax[1].plot(self.dat_dim_range, (self.lines[i]+(i-1)*0.25), label="cluster %d"%(i), c=self.color_rep[i])
 
             else:
                 for i in range(0, self.num_label):
-                    ax[0].plot(self.dat_dim_range, (self.lines[i]), label="cluster %d"%(i+1), c=color_rep[i+1])
-                    ax[1].plot(self.dat_dim_range, (self.lines[i]+i*0.25), label="cluster %d"%(i+1), c=color_rep[i+1])
+                    ax[0].plot(self.dat_dim_range, (self.lines[i]), label="cluster %d"%(i+1), c=self.color_rep[i+1])
+                    ax[1].plot(self.dat_dim_range, (self.lines[i]+i*0.25), label="cluster %d"%(i+1), c=self.color_rep[i+1])
 
             ax[0].legend(fontsize="x-large")
             ax[0].set_xlabel(self.dat_unit)

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='drca',
-    version='0.6.0',
+    version='0.7.0',
     description='DR assisted cluster analysis for hyperspectral datasets',
     author='Jinseok Ryu',
     author_email='jinseuk56@gmail.com',
