@@ -239,6 +239,7 @@ class drca():
                 dataset_flat = dataset_flat / np.max(dataset_flat, axis=1)[:, np.newaxis]
             else:
                 dataset_flat = dataset_flat / np.max(dataset_flat, axis=(1,2))[:, np.newaxis, np.newaxis]
+            dataset_flat = np.nan_to_num(dataset_flat)
             print(np.min(dataset_flat), np.max(dataset_flat))
             
         if rescale_0to1:
