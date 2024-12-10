@@ -1,13 +1,10 @@
 # DR-assisted Cluster Analysis
 
-Dimensionality-reduction-assisted cluster analysis for STEM-derived multi-dimensional data (EELS-SI, 4D-STEM)
-
+This work describes a machine learning approach to the feature extraction from multi-dimensional microscopy datasets. By this unsupervised learning manner, the data (pixels) can be classified into several groups that represent important features inherent in the dataset.
 ___
 
 ### How to install
-<code>pip install drca  
-</code>
-
+`pip install drca`  
 ___
 
 ### Citation
