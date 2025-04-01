@@ -1,6 +1,7 @@
 # DR-assisted Cluster Analysis
 
 This work describes a machine learning approach to the feature extraction from multi-dimensional microscopy datasets. By this unsupervised learning manner, the data (pixels) can be classified into several groups that represent important features inherent in the dataset.
+![schematic](img/schematic.png)
 ___
 
 ### How to install
