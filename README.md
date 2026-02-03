@@ -8,6 +8,11 @@ ___
 `pip install drca`  
 ___
 
+### Application examples
+1) Ryu, J., Lee, S., Kim, S., Joo, Y. C., & Kim, M. (2022). Correlative study between the local atomic and electronic structures of amorphous carbon materials via 4D-STEM and STEM-EELS. Applied Physics Letters, 121(4).
+2) Kim, S., Kim, U. G., Ryu, J., Kim, D., Kim, M., Joo, Y. C., & Lee, S. Y. (2023). Boron-doped amorphous carbon deposited by DC sputtering for a hardmask: Microstructure and dry etching properties. Applied Surface Science, 637, 157895.
+___
+
 ### Citation
 @article{ryu2021drca,<br>
 author = {Ryu, J. and Kim, H. and Kim, R. M. and Kim, S. and Jo, J. and Lee, S. and Nam, K. T. and Joo, Y. C. and Yi, G. C. and Lee, J. and Kim, M.},<br>
