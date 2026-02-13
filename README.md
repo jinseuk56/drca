@@ -9,8 +9,9 @@ ___
 ___
 
 ### Application examples
-1) Ryu, J., Lee, S., Kim, S., Joo, Y. C., & Kim, M. (2022). Correlative study between the local atomic and electronic structures of amorphous carbon materials via 4D-STEM and STEM-EELS. Applied Physics Letters, 121(4).
-2) Kim, S., Kim, U. G., Ryu, J., Kim, D., Kim, M., Joo, Y. C., & Lee, S. Y. (2023). Boron-doped amorphous carbon deposited by DC sputtering for a hardmask: Microstructure and dry etching properties. Applied Surface Science, 637, 157895.
+1) Ryu, J., Kim, H., Kim, R. M., Kim, S., Jo, J., Lee, S., ... & Kim, M. (2021). Dimensionality reduction and unsupervised clustering for EELS-SI. Ultramicroscopy, 231, 113314.
+2) Ryu, J., Lee, S., Kim, S., Joo, Y. C., & Kim, M. (2022). Correlative study between the local atomic and electronic structures of amorphous carbon materials via 4D-STEM and STEM-EELS. Applied Physics Letters, 121(4).
+3) Kim, S., Kim, U. G., Ryu, J., Kim, D., Kim, M., Joo, Y. C., & Lee, S. Y. (2023). Boron-doped amorphous carbon deposited by DC sputtering for a hardmask: Microstructure and dry etching properties. Applied Surface Science, 637, 157895.
 ___
 
 ### Citation
