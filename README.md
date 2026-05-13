@@ -8,6 +8,14 @@ ___
 `pip install drca`  
 ___
 
+### Graphical User Interface (GUI)
+An interactive, Streamlit-based web interface for a completely code-free analysis pipeline is provided. Once the package is installed, simply open your terminal and run:  
+
+`drca-gui`  
+
+___
+
+
 ### Application examples
 1) Ryu, J., et al., Dimensionality reduction and unsupervised clustering for EELS-SI. Ultramicroscopy, 2021. 231: p. 113314.
 2) Ryu, J., et al., Correlative study between the local atomic and electronic structures of amorphous carbon materials via 4D-STEM and STEM-EELS. Applied Physics Letters, 2022. 121(4).

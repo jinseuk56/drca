@@ -61,7 +61,7 @@ class drca():
             self.data_storage, self.data_shape = data_load_3d(adr, cr_range, rescale, DM_file, verbose)
         
         else:
-            self.data_storage, self.data_shape = data_load_4d(adr, rescale, verbose)
+            self.data_storage, self.data_shape = data_load_4d(adr, DM_file, rescale, verbose)
             
         self.original_data_shape = self.data_shape.copy()
 
@@ -351,8 +351,7 @@ class drca():
         
         if method=="tsne":
             for order, p in enumerate(perplex):
-                tmp_tsne = TSNE(n_components=num_comp, perplexity=p, early_exaggeration=5.0, learning_rate=300.0, 
-                            init="random", n_iter=1000, verbose=0)
+                tmp_tsne = TSNE(n_components=num_comp, perplexity=p, early_exaggeration=5.0, learning_rate=300.0, init="random", max_iter=1000, verbose=0)                    
                 tmp_tsne.fit_transform(self.DR_coeffs)
                 embeddings.append(tmp_tsne.embedding_)
                 print("%d perplexity %.1f finished"%(order+1, p))
@@ -700,7 +699,57 @@ class drca():
         print("%.2f min have passed"%((time.time()-start)/60))
 
         return self.labels
+
+
+    def preview_clustering(self, method="optics", msample=0.05, steep=0.001, msize=0.05, img_sel=1):
+        start = time.time()
+        current_params = [method, msample, steep, msize]
+
+        # 1. Check if clustering parameters changed. If not, skip computation!
+        if not hasattr(self, 'prev_cluster_params') or self.prev_cluster_params != current_params:
+            print(f"Applying {method.upper()} clustering...")
+            clust = OPTICS(min_samples=msample, xi=steep, min_cluster_size=msize).fit(self.X)
+            self.labels = clust.labels_
+            
+            # Save current parameters to prevent unnecessary reruns
+            self.prev_cluster_params = current_params
+            
+            # Prepare the mock widget for the downstream clustering_result() method
+            class MockWidget:
+                def __init__(self, result): self.result = result
+                def close_all(self): pass
+            class MockInteract:
+                def __init__(self, result): self.widget = MockWidget(result)
+            self.clustering_widgets = MockInteract(self.labels)
+            
+            # Pre-calculate spatial maps
+            self.label_reshape, _, _ = label_arrangement(self.labels, self.data_shape)
+            print(f"Clustering complete in {(time.time()-start)/60:.2f} min.")
+        else:
+            print(f"Parameters unchanged. Reusing cached clusters for Image {img_sel}...")
+
+        # 2. Draw the interactive plot
+        fig = plt.figure(figsize=(10, 4))
+        G = gridspec.GridSpec(1, 2)
         
+        ax1 = plt.subplot(G[0, 0])
+        for klass, color in zip(range(0, len(self.color_rep)), self.color_rep[1:]):
+            Xo = self.X[self.labels == klass]
+            if len(Xo) > 0:
+                ax1.scatter(Xo[:, 0], Xo[:, 1], color=color, alpha=0.3, marker='.')
+        ax1.plot(self.X[self.labels == -1, 0], self.X[self.labels == -1, 1], 'k+', alpha=0.1)
+        ax1.set_title(f"OPTICS Clusters: {len(np.unique(self.labels))}")
+        ax1.axis('off')
+        
+        ax2 = plt.subplot(G[0, 1])
+        ax2.imshow(self.label_reshape[img_sel-1], cmap=self.custom_cmap, norm=self.norm)
+        ax2.set_title(f"Spatial Distribution (Image {img_sel})")
+        ax2.axis('off')
+        
+        fig.tight_layout()
+        return fig
+
+
     def clustering_result(self, tf_map=False, normalize='max', log_scale=True):
         
         self.clustering_widgets.widget.close_all()
@@ -760,6 +809,9 @@ class drca():
                 denominator = np.max(self.lines, axis=1)
             elif normalize == 'min':
                 denominator = np.min(self.lines, axis=1)
+            else:
+                print("Wrong input! Max-normalization implemented")
+                denominator = np.max(self.lines, axis=1)
             self.lines = self.lines / denominator[:, np.newaxis]
 
             if -1 in self.label_sort:
@@ -869,11 +921,14 @@ def data_load_3d(adr, crop=None, rescale=True, DM_file=True, verbose=True):
     return storage, shape
 
 
-def data_load_4d(adr, rescale=False, verbose=True):
+def data_load_4d(adr, DM_file=True, rescale=False, verbose=True):
     storage = []
     shape = []   
     for i, ad in enumerate(adr):
-        tmp = tifffile.imread(ad)
+        if DM_file:
+            tmp = hs.load(adr).data
+        else:
+            tmp = tifffile.imread(ad)
         if rescale:
             tmp = tmp / np.max(tmp)
         if len(tmp.shape) == 3:
@@ -881,7 +936,7 @@ def data_load_4d(adr, rescale=False, verbose=True):
                 tmp = tmp.reshape(int(tmp.shape[0]**(1/2)), int(tmp.shape[0]**(1/2)), tmp.shape[1], tmp.shape[2])
                 print("The scanning shape is automatically corrected")
             except:
-                print("The input data is not 4-dimensional")
+                print("The input data is not 4-dimensional or the scan shape is not a square")
                 print("Please confirm that all options are correct")
 
         if verbose:
@@ -1060,3 +1115,7 @@ def label_arrangement(label_arr, new_shape):
         selected.append(temp)    
         
     return label_reshape, selected, hist
+
+def fourd_roll_axis(stack):
+    stack = np.rollaxis(np.rollaxis(stack, 2, 0), 3, 1)
+    return stack
