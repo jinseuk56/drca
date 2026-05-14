@@ -2,6 +2,7 @@
 # Jinseok Ryu (jinseuk56@gmail.com)
 # https://doi.org/10.1016/j.ultramic.2021.113314
 
+import os
 import numpy as np
 import tifffile
 
@@ -22,8 +23,14 @@ import time
 try:
     import hyperspy.api as hs
 except:
-    print("Hyperspy cannot be imported")
+    print("HyperSpy cannot be imported")
     print("DM files not supported")
+
+try:
+    import py4DSTEM
+except:
+    print("py4DSTEM cannot be imported")
+    print("raw files not supported")
     
 
 class drca():
@@ -927,7 +934,10 @@ def data_load_4d(adr, DM_file=True, rescale=False, verbose=True):
     for i, ad in enumerate(adr):
         if DM_file:
             tmp = hs.load(adr).data
-        else:
+        elif os.path.basename(ad).split(".")[-1] == "raw":
+            tmp = py4DSTEM.io.import_file(ad)
+            tmp = tmp.data
+        elif os.path.basename(ad).split(".")[-1] == "tif" or os.path.basename(ad).split(".")[-1] == "tiff":
             tmp = tifffile.imread(ad)
         if rescale:
             tmp = tmp / np.max(tmp)
@@ -1118,4 +1128,14 @@ def label_arrangement(label_arr, new_shape):
 
 def fourd_roll_axis(stack):
     stack = np.rollaxis(np.rollaxis(stack, 2, 0), 3, 1)
+    return stack
+
+
+def load_binary_4D_stack(img_adr, datatype, original_shape, final_shape, log_scale=False):
+    stack = np.fromfile(img_adr, dtype=datatype)
+    stack = stack.reshape(original_shape)
+    if log_scale:
+        stack = np.log(stack[:final_shape[0], :final_shape[1], :final_shape[2], :final_shape[3]])
+    else:
+        stack = stack[:final_shape[0], :final_shape[1], :final_shape[2], :final_shape[3]]
     return stack

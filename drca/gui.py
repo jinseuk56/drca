@@ -67,7 +67,7 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs([
 
 with tab1:
     st.header("Step 1: Load Data")
-    file_paths_input = st.text_area("Enter absolute file paths (one path per line):", height=80, help="Paste the full system paths to your .dm3, .dm4, or .tif files here.")
+    file_paths_input = st.text_area("Enter absolute file paths (one path per line):", height=80, help="Paste the full system paths to your .dm3, .dm4, .raw or .tif files here.")
     col1, col2 = st.columns(2)
     with col1:
         dat_dim = st.number_input("Data Dimension", value=3, min_value=2, max_value=4, help="Dimensions of hyperspectral data (e.g., 3 for EELS, 4 for 4D-STEM).")
@@ -76,7 +76,7 @@ with tab1:
         dat_scale = st.number_input("Data Scale", value=1.0, help="Specifies the actual step size if integer crop ranges are used.")
     with col2:
         rescale = st.checkbox("Rescale Data", value=False, help="If True, each hyperspectral data array will be divided by its maximum value during loading.")
-        dm_file = st.checkbox("DM File Format (or HSPY)", value=True, help="Check this if you are using DM3/DM4 files requiring hyperspy.")
+        dm_file = st.checkbox("DM File Format (or HSPY)", value=True, help="Check this if you are using the IO module of HyperSpy.")
         verbose = st.checkbox("Verbose Output", value=True, help="Print progress and shapes to the console.")
         
     init_log = st.empty(); init_fig = st.container()
